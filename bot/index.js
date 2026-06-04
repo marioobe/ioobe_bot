@@ -56,7 +56,7 @@ function localParse(message) {
 
 async function parseTransaction(message) {
   try {
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
     const prompt = `Kamu adalah asisten pencatat keuangan pribadi berbahasa Indonesia.
 Tugasmu adalah mengekstrak informasi transaksi keuangan dari pesan pengguna.
 
@@ -108,45 +108,59 @@ async function getMonthlyBalance() {
   return totalPemasukan - totalPengeluaran
 }
 
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason)
+})
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err)
+})
+
 bot.on('message', async (msg) => {
-  if (!msg.text || msg.text.startsWith('/')) return
+  try {
+    if (!msg.text || msg.text.startsWith('/')) return
 
-  const chatId = msg.chat.id
-  const parsed = await parseTransaction(msg.text)
+    const chatId = msg.chat.id
+    const parsed = await parseTransaction(msg.text)
 
-  if (parsed.type === 'none') {
-    await bot.sendMessage(
-      chatId,
-      `Hmm, aku tidak mengenali itu sebagai transaksi. Coba kirim seperti: 'makan siang 15000' atau 'dapat gaji 2000000' \u{1F60A}`
-    )
-    return
+    if (parsed.type === 'none') {
+      await bot.sendMessage(
+        chatId,
+        `Hmm, aku tidak mengenali itu sebagai transaksi. Coba kirim seperti: 'makan siang 15000' atau 'dapat gaji 2000000' \u{1F60A}`
+      )
+      return
+    }
+
+    const { error } = await supabase.from('transactions').insert({
+      type: parsed.type,
+      amount: parsed.amount,
+      category: parsed.category,
+      description: parsed.description,
+      raw_message: msg.text,
+    })
+
+    if (error) {
+      await bot.sendMessage(chatId, `Maaf, terjadi kesalahan: ${error.message}`)
+      return
+    }
+
+    const saldo = await getMonthlyBalance()
+    const typeLabel = parsed.type === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'
+
+    const reply =
+      `\u2705 Transaksi dicatat!\n\n` +
+      `\u{1F4CD} Tipe     : ${typeLabel}\n` +
+      `\u{1F4B0} Nominal  : Rp ${parsed.amount.toLocaleString('id-ID')}\n` +
+      `\u{1F3F7}\uFE0F Kategori : ${parsed.category.charAt(0).toUpperCase() + parsed.category.slice(1)}\n` +
+      `\u{1F4DD} Deskripsi: ${parsed.description}\n\n` +
+      `Saldo bulan ini: Rp ${saldo.toLocaleString('id-ID')}`
+
+    await bot.sendMessage(chatId, reply)
+  } catch (err) {
+    console.error('Message handler error:', err)
+    try {
+      await bot.sendMessage(msg.chat.id, 'Maaf, terjadi kesalahan internal. Coba lagi nanti.')
+    } catch {}
   }
-
-  const { error } = await supabase.from('transactions').insert({
-    type: parsed.type,
-    amount: parsed.amount,
-    category: parsed.category,
-    description: parsed.description,
-    raw_message: msg.text,
-  })
-
-  if (error) {
-    await bot.sendMessage(chatId, `Maaf, terjadi kesalahan: ${error.message}`)
-    return
-  }
-
-  const saldo = await getMonthlyBalance()
-  const typeLabel = parsed.type === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran'
-
-  const reply =
-    `\u2705 Transaksi dicatat!\n\n` +
-    `\u{1F4CD} Tipe     : ${typeLabel}\n` +
-    `\u{1F4B0} Nominal  : Rp ${parsed.amount.toLocaleString('id-ID')}\n` +
-    `\u{1F3F7}\uFE0F Kategori : ${parsed.category.charAt(0).toUpperCase() + parsed.category.slice(1)}\n` +
-    `\u{1F4DD} Deskripsi: ${parsed.description}\n\n` +
-    `Saldo bulan ini: Rp ${saldo.toLocaleString('id-ID')}`
-
-  await bot.sendMessage(chatId, reply)
 })
 
 console.log('ioobe_bot polling started...')
