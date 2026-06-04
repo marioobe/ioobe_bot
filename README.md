@@ -165,7 +165,9 @@ Kirim pesan natural ke bot:
 
 ## 📸 Screenshot
 
-> *(Tambahkan screenshot dashboard di sini)*
+![Dashboard - Ringkasan](public/screenshots/dashboard.png)
+
+*Isi file `public/screenshots/dashboard.png` dengan screenshot halaman dashboard.*
 
 ---
 
