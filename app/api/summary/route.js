@@ -15,14 +15,18 @@ export async function GET(request) {
   const endOfMonth = new Date(year, month, 0, 23, 59, 59).toISOString()
 
   const supabaseAdmin = getSupabaseAdmin()
-  const { data: transactions } = await supabaseAdmin
+  const { data: transactions, error: txError } = await supabaseAdmin
     .from('transactions')
     .select('*')
     .gte('created_at', startOfMonth)
     .lte('created_at', endOfMonth)
 
+  if (txError) {
+    return NextResponse.json({ error: txError.message }, { status: 500 })
+  }
+
   if (!transactions) {
-    return NextResponse.json({ error: 'Failed to fetch' }, { status: 500 })
+    return NextResponse.json({ error: 'No data returned' }, { status: 500 })
   }
 
   const totalPemasukan = transactions
