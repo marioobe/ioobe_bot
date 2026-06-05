@@ -6,16 +6,16 @@ Aplikasi pencatat keuangan pribadi berbasis **Telegram Bot + AI + Web Dashboard*
 
 ## ✨ Fitur
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| **Telegram Bot** | Input transaksi via chat natural |
-| **AI Parsing** | Gemini AI otomatis mengekstrak tipe, nominal, kategori dari pesan |
-| **Fallback Parser** | Local parser jika kuota AI habis |
-| **Web Dashboard** | Grafik pemasukan/pengeluaran, pie chart kategori, tren saldo |
-| **Riwayat Transaksi** | Tabel lengkap dengan filter, search, pagination |
-| **Tambah Manual** | Form input transaksi langsung dari web |
-| **AI Insight** | Analisis keuangan otomatis oleh Gemini |
-| **Responsive** | Bisa diakses dari HP |
+| Fitur                 | Deskripsi                                                         |
+| --------------------- | ----------------------------------------------------------------- |
+| **Telegram Bot**      | Input transaksi via chat natural                                  |
+| **AI Parsing**        | Gemini AI otomatis mengekstrak tipe, nominal, kategori dari pesan |
+| **Fallback Parser**   | Local parser jika kuota AI habis                                  |
+| **Web Dashboard**     | Grafik pemasukan/pengeluaran, pie chart kategori, tren saldo      |
+| **Riwayat Transaksi** | Tabel lengkap dengan filter, search, pagination                   |
+| **Tambah Manual**     | Form input transaksi langsung dari web                            |
+| **AI Insight**        | Analisis keuangan otomatis oleh Gemini                            |
+| **Responsive**        | Bisa diakses dari HP                                              |
 
 ---
 
@@ -36,7 +36,7 @@ Aplikasi pencatat keuangan pribadi berbasis **Telegram Bot + AI + Web Dashboard*
 ```
 ioobe_bot/
 ├── app/
-│   ├── layout.jsx                    # Root layout
+│   ├── layout.jsx                    # Shared layout (Sidebar + Footer + konten)
 │   ├── page.jsx                      # Redirect ke /dashboard
 │   ├── globals.css                   # Tailwind + custom styles
 │   ├── dashboard/page.jsx            # Dashboard utama
@@ -47,7 +47,8 @@ ioobe_bot/
 │       ├── insight/route.js          # AI insight Gemini
 │       └── telegram/webhook/route.js # Webhook Telegram
 ├── components/
-│   ├── Sidebar.jsx                   # Navigasi
+│   ├── Sidebar.jsx                   # Navigasi (fixed + responsive hamburger)
+│   ├── Footer.jsx                    # Footer "Dibuat dengan ❤️ Oleh Io Obe"
 │   ├── SummaryCard.jsx               # Card ringkasan
 │   ├── TransactionTable.jsx          # Tabel transaksi
 │   ├── AddTransactionModal.jsx       # Modal tambah manual
@@ -144,30 +145,28 @@ https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook?url=https://your-app
 
 Kirim pesan natural ke bot:
 
-| Pesan | Hasil |
-|-------|-------|
-| `makan siang 15000` | Pengeluaran Rp 15.000 (kategori: makan) |
-| `bensin 50000` | Pengeluaran Rp 50.000 (kategori: transport) |
-| `gaji 2000000` | Pemasukan Rp 2.000.000 (kategori: gaji) |
-| `transfer dari mama 500000` | Pemasukan Rp 500.000 (kategori: transfer) |
-| `halo apa kabar` | Ditolak (bukan transaksi) |
+| Pesan                       | Hasil                                       |
+| --------------------------- | ------------------------------------------- |
+| `makan siang 15000`         | Pengeluaran Rp 15.000 (kategori: makan)     |
+| `bensin 50000`              | Pengeluaran Rp 50.000 (kategori: transport) |
+| `gaji 2000000`              | Pemasukan Rp 2.000.000 (kategori: gaji)     |
+| `transfer dari mama 500000` | Pemasukan Rp 500.000 (kategori: transfer)   |
+| `halo apa kabar`            | Ditolak (bukan transaksi)                   |
 
 ---
 
 ## 📊 Halaman Dashboard
 
-| Halaman | URL | Fitur |
-|---------|-----|-------|
-| **Dashboard** | `/dashboard` | Summary cards, bar chart, pie chart, line chart, transaksi terbaru, AI insight |
-| **Transaksi** | `/transactions` | Tabel lengkap, filter bulan/tipe/kategori, search, pagination, tambah manual |
+| Halaman       | URL             | Fitur                                                                          |
+| ------------- | --------------- | ------------------------------------------------------------------------------ |
+| **Dashboard** | `/dashboard`    | Summary cards, bar chart, pie chart, line chart, transaksi terbaru, AI insight |
+| **Transaksi** | `/transactions` | Tabel lengkap, filter bulan/tipe/kategori, search, pagination, tambah manual   |
 
 ---
 
 ## 📸 Screenshot
 
 ![Dashboard - Ringkasan](public/screenshots/dashboard.png)
-
-*Isi file `public/screenshots/dashboard.png` dengan screenshot halaman dashboard.*
 
 ---
 
